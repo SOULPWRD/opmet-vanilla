@@ -26,7 +26,13 @@ function render_css() {
             padding: 1em;
             display: block;
             border: 1px solid black;
-            background-color: red;
+            background-color: tomato;
+        }
+        noresult {
+            padding: 1em;
+            background-color: powderblue;
+            display: block;
+            border: 1px solid black;
         }
     `;
 }
@@ -38,7 +44,7 @@ const make_opmet = ui("ui-opmet", function (element, {
     const results_ui = dom("results");
     const style = dom("style");
 
-    function clear_table() {
+    function clear_results() {
         results_ui.innerText = "";
     }
 
@@ -81,8 +87,16 @@ const make_opmet = ui("ui-opmet", function (element, {
         results_ui.append(error);
     }
 
+    function show_no_results() {
+        const no_result = dom("noresult", [
+            dom("p", ["No results found for given query"])
+        ]);
+
+        results_ui.append(no_result);
+    }
+
     function on_submit(state) {
-        clear_table();
+        clear_results();
 
         fetch(url, {
             body: JSON.stringify({
@@ -105,7 +119,12 @@ const make_opmet = ui("ui-opmet", function (element, {
             if (data.error) {
                 show_error(data.error.message, data.error.code);
                 return;
-            }            
+            }
+
+            if (data.result.length === 0) {
+                show_no_results();
+                return;
+            }
 
             append_table(
                 utils.group_by(data.result, "stationId")
