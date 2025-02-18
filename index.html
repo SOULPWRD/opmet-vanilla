@@ -2,9 +2,19 @@
 <html>
     <head>
         <title>OPMET</title>
+        <meta charset="utf-8"/>
     </head>
     <body>
         <div id="root"></div>
-        <script type="module" src="./opmet.js"></script>
+        <script type="module">
+            import make_opmet from "./opmet_ui.js";
+            import config from "./config.js"
+
+            const opmet_ui = make_opmet({
+                url: config.json_rpc_url
+            });
+            const root = document.getElementById(config.root);
+            root.append(opmet_ui);
+        </script>
     </body>
 </html>
