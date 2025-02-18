@@ -2,6 +2,7 @@
 // Martin Pravda
 
 /*jslint browser */
+/*global crypto */
 
 import ui from "./ui.js";
 import make_form from "./form_ui.js";
@@ -51,7 +52,7 @@ const make_opmet = ui("ui-opmet", function (element, {
     function format_row(data) {
         const record = utils.pick(data, [
             "queryType",
-            "reportTime",
+            ["reportTime", utils.format_timestamp],
             "textHTML"
         ]);
 
@@ -96,15 +97,15 @@ const make_opmet = ui("ui-opmet", function (element, {
     }
 
     function on_submit(state) {
+        const uuid = crypto.randomUUID();
         clear_results();
-
         fetch(url, {
             body: JSON.stringify({
-                id: "query01",
+                id: `query-${uuid}`,
                 method: "query",
                 params: [{
                     countries: state.countries,
-                    id: "briefing01",
+                    id: `briefing-${uuid}`,
                     reportTypes: state.report_types,
                     stations: state.stations
                 }]
