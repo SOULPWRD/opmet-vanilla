@@ -11,15 +11,15 @@ In order to run Replete make sure you have [Nodejs](https://nodejs.org/en/downlo
 
 ## Conventions
 
-The whole codebase is linted by [JSLint](https://www.jslint.com/). Name of the identifiers are written with _snake_case_ for better readability.
+The whole codebase is linted by [JSLint](https://www.jslint.com/). Name of the identifiers are written in _snake_case_ for better readability.
 
-Individual tests and demos exist within the files. There's no separation of concerns. This is called [Whole Modules](https://james.diacono.com.au/whole_modules.html).
+Individual tests and demos live together with the source code. There's no separation of concerns. This is called [Whole Modules](https://james.diacono.com.au/whole_modules.html).
 
 It is dependency free.
 
 ## Serving index.html
 
-In order to run index.html, run following command `npx serve` in your terminal.
+In order to run index.html, run `npx serve` in your terminal.
 
 ### Enjoy.
 
