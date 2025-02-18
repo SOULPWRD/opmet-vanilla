@@ -39,7 +39,7 @@ function render_css() {
     `;
 }
 
-const make_form = ui("ui-form", function (element, {
+const make_form = ui("form-ui", function (element, {
     on_submit
 }) {
     const shadow = element.attachShadow({mode: "closed"});

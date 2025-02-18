@@ -38,7 +38,7 @@ function render_css() {
     `;
 }
 
-const make_opmet = ui("ui-opmet", function (element, {
+const make_opmet = ui("opmet-ui", function (element, {
     url
 }) {
     const shadow = element.attachShadow({mode: "closed"});
