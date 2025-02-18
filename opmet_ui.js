@@ -22,6 +22,12 @@ function render_css() {
         td {
             padding: 0.5em;
         }
+        error {
+            padding: 1em;
+            display: block;
+            border: 1px solid black;
+            background-color: red;
+        }
     `;
 }
 
@@ -29,11 +35,11 @@ const make_opmet = ui("ui-opmet", function (element, {
     url
 }) {
     const shadow = element.attachShadow({mode: "closed"});
-    const table_ui = dom("results");
+    const results_ui = dom("results");
     const style = dom("style");
 
     function clear_table() {
-        table_ui.innerText = "";
+        results_ui.innerText = "";
     }
 
     function format_row(data) {
@@ -62,7 +68,17 @@ const make_opmet = ui("ui-opmet", function (element, {
         });
 
         const table = dom("table", rows);
-        table_ui.append(table);
+        results_ui.append(table);
+    }
+
+    function show_error(message, code) {
+        const error = dom("error", [
+            dom("p", ["An error occured."]),
+            dom("p", [`Code: ${code}`]),
+            dom("p", [`Message: ${message}`])
+        ]);
+
+        results_ui.append(error);
     }
 
     function on_submit(state) {
@@ -83,6 +99,14 @@ const make_opmet = ui("ui-opmet", function (element, {
         }).then(function (response) {
             return response.json();
         }).then(function (data) {
+
+// JSON-RPC returns an error object if some error occurs
+
+            if (data.error) {
+                show_error(data.error.message, data.error.code);
+                return;
+            }            
+
             append_table(
                 utils.group_by(data.result, "stationId")
             );
@@ -91,7 +115,7 @@ const make_opmet = ui("ui-opmet", function (element, {
     const form_ui = make_form({on_submit});
 
     style.textContent = render_css();
-    shadow.append(style, form_ui, table_ui);
+    shadow.append(style, form_ui, results_ui);
 });
 
 //demo import config from "./config.js";
