@@ -128,7 +128,9 @@ const make_opmet = ui("opmet-ui", function (element, {
             }
 
             append_table(
-                utils.group_by(data.result, "stationId")
+                Object.groupBy(data.result, function ({stationId}) {
+                    return stationId;
+                })
             );
         });
     }

@@ -8,6 +8,10 @@
 import ui from "./ui.js";
 import dom from "./dom.js";
 
+// a simple input sanitizer
+
+const rx_delete_default = /[<>&%"\\]/g;
+
 function render_css() {
     return `
         :host {
@@ -69,7 +73,10 @@ const make_form = ui("form-ui", function (element, {
             const value = event.target.value;
 
             if (value) {
-                value.split(" ").forEach(function (value) {
+                value.replace(
+                    rx_delete_default,
+                    ""
+                ).toUpperCase().split(" ").forEach(function (value) {
                     store.add(value);
                 });
             }
