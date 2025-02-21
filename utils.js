@@ -21,11 +21,20 @@ function pick(object, properties = []) {
 //demo }]]);
 
 function format_timestamp(timestamp) {
-    const [date, time] = timestamp.split("T");
-    const european_date_format = date.split("-").reverse().join(".");
-    return `${european_date_format} ${time.slice(0, -1)}`;
+    const date_object = new Date(timestamp);
+    const date = date_object.toLocaleDateString();
+    const time = date_object.toLocaleTimeString();
+    const date_array = date.split("/");
+    const slovak_date_format = `${
+        date_array[1]
+    }.${
+        date_array[0]
+    }.${
+        date_array[2]
+    }`;
+    return `${slovak_date_format} ${time.split(" ").slice(0, -1)}`;
 }
-// format_timestamp("2025-02-21T09:50:00Z")
+//demo format_timestamp("2025-02-21T09:50:00Z")
 
 function colorify(value, color) {
     return `<font color=\"${color}\">${value}</font>`;
@@ -33,7 +42,7 @@ function colorify(value, color) {
 //demo colorify("Hello world", "yellow");
 
 function format_text(text) {
-    const rx_text = /(BKN|FEW|SCT)(\d+)/g
+    const rx_text = /(BKN|FEW|SCT)(\d+)/g;
     return text.replace(rx_text, function (string, ignore, number) {
         if (number < 30) {
             return colorify(string, "blue");
