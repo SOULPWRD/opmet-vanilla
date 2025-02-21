@@ -53,7 +53,7 @@ const make_opmet = ui("opmet-ui", function (element, {
         const record = utils.pick(data, [
             "queryType",
             ["reportTime", utils.format_timestamp],
-            "textHTML"
+            ["text", utils.format_text]
         ]);
 
         const columns = Object.values(record).map(function (value) {

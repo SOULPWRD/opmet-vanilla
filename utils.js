@@ -22,7 +22,25 @@ function format_timestamp(timestamp) {
     return `${european_date_format} ${time.slice(0, -1)}`;
 }
 
+function colorify(value, color) {
+    return `<font color=\"${color}\">${value}</font>`;
+}
+//demo colorify("Hello world", "yellow");
+
+function format_text(text) {
+    const rx_text = /(BKN|FEW|SCT)(\d+)/g
+    return text.replace(rx_text, function (string, ignore, number) {
+        if (number < 30) {
+            return colorify(string, "blue");
+        }
+        return colorify(string, "red");
+    });
+}
+//demo format_text("FEW101");
+//demo format_text("BKN01");
+
 export default Object.freeze({
+    format_text,
     format_timestamp,
     pick
 });
