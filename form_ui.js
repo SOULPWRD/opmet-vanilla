@@ -7,6 +7,7 @@
 
 import ui from "./ui.js";
 import dom from "./dom.js";
+import make_validator from "./validator.js";
 
 // a simple input sanitizer
 
@@ -25,6 +26,10 @@ function render_css() {
         inputs > * {
             display: block;
             margin: 1em;
+        }
+        inputs > p {
+            font-size: xx-small;
+            background-color: tomato
         }
         airports > input, countries > input {
             width: 14em;
@@ -47,11 +52,26 @@ const make_form = ui("form-ui", function (element, {
     on_submit
 }) {
     const shadow = element.attachShadow({mode: "closed"});
+    const validator = make_validator();
     const report_types = new Set();
     const stations = new Set();
     const countries = new Set();
 
     const style = dom("style");
+
+    function get_state() {
+        return Object.freeze({
+            countries: [...countries],
+            report_types: [...report_types],
+            stations: [...stations]
+        });
+    }
+
+    function validate_input(type) {
+        return function () {
+            validator.validate(type);
+        };
+    }
 
     function update_report_type(type) {
         return function (event) {
@@ -60,10 +80,11 @@ const make_form = ui("form-ui", function (element, {
 
             if (checked) {
                 report_types.add(type);
-                return;
+            } else {
+                report_types.delete(type);
             }
 
-            report_types.delete(type);
+            validator.validate("message_type");
         };
     }
 
@@ -80,11 +101,17 @@ const make_form = ui("form-ui", function (element, {
                     store.add(value);
                 });
             }
+
+            validator.validate("stations_countries");
         };
     }
 
     function make_title(title) {
         return dom("p", [title]);
+    }
+
+    function make_validation_message(message) {
+        return dom("p", {style: {display: "none"}}, [message]);
     }
 
     function make_label(for_element) {
@@ -102,30 +129,38 @@ const make_form = ui("form-ui", function (element, {
     const metar_checkbox = dom("input", {
         id: "metar",
         onclick: update_report_type("metar"),
+        onblur: validate_input("message_type"),
         type: "checkbox"
     });
     const sigmet_checkbox = dom("input", {
         id: "sigmet",
         onclick: update_report_type("sigmet"),
+        onblur: validate_input("message_type"),
         type: "checkbox"
     });
     const taf_checkbox = dom("input", {
         id: "taf",
         onclick: update_report_type("taf_longtaf"),
+        onblur: validate_input("message_type"),
         type: "checkbox"
     });
 
     const stations_input = dom("input", {
         id: "airports",
         oninput: update_input_text(stations),
+        onblur: validate_input("stations_countries"),
         type: "text"
     });
     const countries_input = dom("input", {
         id: "countries",
         oninput: update_input_text(countries),
+        onblur: validate_input("stations_countries"),
         type: "text"
     });
 
+    const vm_message_types = make_validation_message(
+        "At least one of the options has to be selected"
+    );
     const message_types_ui = dom("message-types", [
         metar_checkbox,
         make_label("Metar"),
@@ -134,6 +169,9 @@ const make_form = ui("form-ui", function (element, {
         taf_checkbox,
         make_label("Taf")
     ]);
+    const vm_airports_countries = make_validation_message(
+        "At least one country or airport code has to be specified"
+    )
     const airports_ui = dom("airports", [
         stations_input
     ]);
@@ -145,23 +183,18 @@ const make_form = ui("form-ui", function (element, {
         onclick: function () {
             on_submit(get_state());
         },
+        disabled: true,
         type: "submit",
         value: "Create briefing"
     });
 
     const inputs = dom("inputs", [
         message_types_ui,
+        vm_message_types,
         airports_ui,
-        countries_ui
+        countries_ui,
+        vm_airports_countries
     ]);
-
-    function get_state() {
-        return Object.freeze({
-            countries: [...countries],
-            report_types: [...report_types],
-            stations: [...stations]
-        });
-    }
 
     function clear() {
         stations_input.value = "";
@@ -174,6 +207,48 @@ const make_form = ui("form-ui", function (element, {
             }
         });
     }
+
+// a simple input validation
+
+    validator.register("message_type", {
+        predicate() {
+            return report_types.size >= 1
+        },
+        effect(passes) {
+            if (passes) {
+                vm_message_types.style.display="none"
+                return;
+            }
+
+            vm_message_types.style.display="block";
+        }
+    });
+
+    validator.register("stations_countries", {
+        predicate() {
+            return (
+                stations.size >= 1
+                || countries.size >= 1
+            );
+        },
+        effect(passes) {
+            if (passes) {
+                vm_airports_countries.style.display="none"
+                return;
+            }
+
+            vm_airports_countries.style.display="block";
+        }
+    });
+
+    validator.on_valid(function (passes) {
+        if (passes) {
+            submit_button.disabled = false;
+            return;
+        }
+
+        submit_button.disabled = true;
+    });
 
     style.textContent = render_css();
     shadow.append(
