@@ -15,12 +15,17 @@ function pick(object, properties = []) {
         return o;
     }, {});
 }
+//demo pick({a: 1, b: 2}, ["a"]);
+//demo pick({a: 1, b: 2}, [["b", function (value) {
+//demo     return value * value;
+//demo }]]);
 
 function format_timestamp(timestamp) {
     const [date, time] = timestamp.split("T");
     const european_date_format = date.split("-").reverse().join(".");
     return `${european_date_format} ${time.slice(0, -1)}`;
 }
+// format_timestamp("2025-02-21T09:50:00Z")
 
 function colorify(value, color) {
     return `<font color=\"${color}\">${value}</font>`;
