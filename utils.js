@@ -24,6 +24,5 @@ function format_timestamp(timestamp) {
 
 export default Object.freeze({
     format_timestamp,
-    group_by,
     pick
 });
